@@ -1,0 +1,18 @@
+
+__Encodings
+String: <len, UTF-8>
+Seq: <len, a[0],...,a[n]>
+__Pairs
+PairString: 0x0 <String, String>
+PairInt: 0x1 <String, int>
+PairFloat: 0x2 <String, float>
+PairBool: 0x3 <String, bool>
+PairDict: 0x4 <String, Seq{Pair}r>
+PairList: 0x5 <String, Seq>
+__Primitives
+PrimString: 0x6 <String>
+PrimInt: 0x7 <int>
+PrimFloat: 0x8 <float>
+PrimBool: 0x9 <bool>
+PrimDict: 0xA <Seq{Pair}>
+PrimList: 0xB <Sec>
