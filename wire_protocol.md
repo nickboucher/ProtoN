@@ -22,10 +22,10 @@ Network Byte Order (Big-Endian)
 
 ### Primitives (Prim)
 
-- **PrimString**: *0q0* <String>
-- **PrimInt**: *0q1* <int>
-- **PrimFloat**: *0q2* <float>
-- **PrimBool**: *0q3* <bool>
+- **PrimString**: *0q0* <String\>
+- **PrimInt**: *0q1* <int\>
+- **PrimFloat**: *0q2* <float\>
+- **PrimBool**: *0q3* <bool\>
 
 ### Containers (Con)
 
