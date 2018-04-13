@@ -1,7 +1,12 @@
 
+__Byte Order
+Network Byte Order (Big-Endian)
 __Encodings
 String: <len, UTF-8>
 Seq: <len, a[0],...,a[n]>
+int: 64-bit int
+float: 64-bit float
+bool: bit
 __Pairs
 PairString: 0x0 <String, String>
 PairInt: 0x1 <String, int>
