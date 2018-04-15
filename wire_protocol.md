@@ -26,6 +26,7 @@ Network Byte Order (Big-Endian)
 - **PrimInt**: *0q1* <int\>
 - **PrimFloat**: *0q2* <float\>
 - **PrimBool**: *0q3* <bool\>
+- **Note: We currently have no way to encode** `null` **or** `None`
 
 ### Containers (Con)
 
@@ -39,3 +40,11 @@ Network Byte Order (Big-Endian)
 - `ConList`'s OpCode is followed by a string (it's key) and then the number of 1st-level `Prim`|`Con` it contains and then the same number of subsequent Container or Primitive values
 - "Dictionaries" are represented as `ConList`s containing one or more `ConPair`s
 - Each message starts with a version number and is immediately followed by exactly one Container
+
+## Wire Buffer Structure
+
+Order of contents on the wire:
+
+1. Protocol version: `0q1`
+2. Number of 1st level (oldest ancestor) containers: *len* `n`
+3. `n` number of `Con`
