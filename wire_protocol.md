@@ -1,6 +1,10 @@
 
 # Wire Protocol
 
+## Proposed Name
+
+Nicholas proposes naming the project `ProtoN`, standing for "protocol nimble" and pronounced *proton*.
+
 ## Representation Notes
 
 ### Numerical Representation Notes
@@ -26,7 +30,6 @@ Network Byte Order (Big-Endian)
 - **PrimInt**: *0q1* <int\>
 - **PrimFloat**: *0q2* <float\>
 - **PrimLogical**: *0q3* <logical\>
-- **Note: We currently have no way to encode** `null` **or** `None`
 
 ### Containers (Con)
 
