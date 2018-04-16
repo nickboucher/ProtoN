@@ -14,7 +14,7 @@ Network Byte Order (Big-Endian)
 ### Encodings
 - int: 64-bit signed integer
 - float: IEEE 754 64-bit signed floating point number
-- bool: 1-bit boolean {0: False; 1 True}
+- logical: 2-bit encoding of special logical values {0: `False`; 1: `True`; 2: `null`; 3: "Error State"}
 - len: unsigned 32-bit integer
 - String: <len, UTF-8 encoded string>
 
@@ -25,7 +25,7 @@ Network Byte Order (Big-Endian)
 - **PrimString**: *0q0* <String\>
 - **PrimInt**: *0q1* <int\>
 - **PrimFloat**: *0q2* <float\>
-- **PrimBool**: *0q3* <bool\>
+- **PrimLogical**: *0q3* <logical\>
 - **Note: We currently have no way to encode** `null` **or** `None`
 
 ### Containers (Con)
