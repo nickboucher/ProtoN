@@ -18,7 +18,7 @@ Network Byte Order (Big-Endian)
 ### Encodings
 - int: 64-bit signed integer
 - float: IEEE 754 64-bit signed floating point number
-- logical: 2-bit encoding of special logical values {0: `False`; 1: `True`; 2: `null`; 3: "Error State"}
+- logical: 2-bit encoding of special logical values {0q0: `False`; 0q1: `True`; 0q2: `null`; 0q3: "Error State"}
 - len: unsigned 32-bit integer
 - String: <len, UTF-8 encoded string>
 
