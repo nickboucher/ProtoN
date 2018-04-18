@@ -21,7 +21,7 @@ Network Byte Order (Big-Endian)
 - int32: 32-bit signed integer
 - float32: IEEE 754 32-bit signed floating point number
 - bool: 1-bit encoding of boolean values {0b0: `False`; 0b1: `True`}
-- len: <bool, uint16|uint32> if bool false, then unsigned 16-bit integer, else if bool true then 32-bit integer
+- len: unsigned 16-bit integer
 - String: <len, UTF-8 encoded string>
 
 ## OpCodes
@@ -49,7 +49,6 @@ Network Byte Order (Big-Endian)
 - `ConList`'s OpCode is followed by the number of 1st-level `Prim`|`Con` it contains and then the same number of subsequent Container or Primitive values
 - `ConObject`s OpCode is followed by the number of 1st-level `Key` it contains and then the same number of subsequent Key values
 - Each message starts with a version number and is immediately followed by exactly one Container
-- If a type `PrimString` is immediately followed by another `PrimString`, it will be considered as silently concatenated with the previous `PrimString` in order to support strings of arbitrary length
 
 ## Wire Buffer Structure
 
