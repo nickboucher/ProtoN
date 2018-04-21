@@ -19,7 +19,6 @@ Network Byte Order (Big-Endian)
 - int64: 64-bit signed integer
 - float64: IEEE 754 64-bit signed floating point number
 - int32: 32-bit signed integer
-- float32: IEEE 754 32-bit signed floating point number
 - bool: 1-bit encoding of boolean values {0b0: `False`; 0b1: `True`}
 - len: unsigned 16-bit integer
 - String: <len, UTF-8 encoded string>
@@ -31,7 +30,7 @@ Network Byte Order (Big-Endian)
 - **PrimNull**: *0o0*
 - **PrimString**: *0o1* <String\>
 - **PrimInt**: *0o2* <bool, int32|int64\>
-- **PrimFloat**: *0o3* <bool, float32|float64\>
+- **PrimFloat**: *0o3* <float64\>
 - **PrimBool**: *0o4* <bool\>
 
 ### Keys (Key)
