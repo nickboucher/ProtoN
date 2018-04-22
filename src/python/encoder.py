@@ -1,22 +1,20 @@
 #! /usr/env python
 
 from constants import *
-import struct
+from struct import pack, unpack, calcsize
+from collections import Mapping, Set, Sequence
 
-
-from constants import *
-import struct
-
+string_types = (str, bytes)
 primitive_types = (int, str, float, type(None))
 
 def pack_message(bytelist):
-    bytelist.insert(0, pack('!B', PROTOCOL_VERSION]
+    bytelist.insert(0, pack('!B', PROTOCOL_VERSION))
     return b''.join(bytelist)
 
 def encode_variable(data):
     """Infers the type of data, then packs it into a network-order
     bytestring in accordance with the wire protocol. Data must be of type:
-    int, str, float, None.
+    int, str, float, boolean, None.
     @param data - the data to pack"""
     if data is None:
         return pack('!B', TYPE_NULL)
@@ -31,6 +29,9 @@ def encode_variable(data):
             return pack('!B?q', TYPE_INT, True, data)
     if isinstance(data, float):
         return pack('!Bd', TYPE_FLOAT, data)
+
+    if isinstance(data, boolean):
+        return pack('!B?', TYPE_BOOL, data)
 
     else:
         raise TypeError("Wire protocol does not support this data type. \
@@ -51,6 +52,7 @@ def encode_object(obj, bytelist, memo=None):
 
         for key, value in obj.items():
             assert(isinstance(key, str))
+            bytelist.append(pack("!B", TYPE_PAIR))
             bytelist.append(encode_variable(key))
             encode_object(value, bytelist, memo)
         memo.remove(id(obj))
