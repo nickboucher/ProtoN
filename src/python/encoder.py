@@ -30,7 +30,7 @@ def encode_variable(data):
         else:
             return pack_type(TYPE_INT) + pack_bool(True) + BitStream(int=data, length=64)
     if isinstance(data, float):
-        return pack_type(TYPE_FLOAT) + pack('d', TYPE_FLOAT, data)
+        return pack_type(TYPE_FLOAT) + pack('d', data)
 
     if isinstance(data, boolean):
         return pack_bool(boolean)
