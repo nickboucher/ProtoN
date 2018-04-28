@@ -1,4 +1,5 @@
-# Automatic Protocol Buffers
+# ProtoN
+**Protocol: Nimble**
 
 *Nicholas Boucher		Aron Szanto*
 
