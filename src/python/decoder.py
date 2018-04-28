@@ -2,23 +2,20 @@
 
 from constants import *
 from struct import pack, unpack, calcsize
-
+from bitstring import Bits, BitStream
 
 primitive_type_codes = set([TYPE_NULL, TYPE_BOOL, TYPE_INT, TYPE_STRING, TYPE_FLOAT])
 
 
 def decode(payload):
-    assert(isinstance(payload, bytes))
-
+    payload = BitStream(payload)
     version, payload = decode_version(payload)
     assert(version == PROTOCOL_VERSION)
     return decode_object(payload)[0]
 
 
 def decode_version(payload):
-    version_sz = calcsize('!B')
-    version_bin, payload = payload[:version_sz], payload[version_sz:]
-    (version,) = unpack('!B', version_bin)
+    version, payload = payload.readlist(['uint:2, bits'])
     return version, payload
 
 
@@ -48,9 +45,7 @@ def decode_object(payload):
 
 def unpack_dtype(payload):
     """Reads the type of data stipulated at the head of a bytestring"""
-    dtype_sz = calcsize('!B')
-    dtype_bin, payload = payload[:dtype_sz], payload[dtype_sz:]
-    (dtype,) = unpack('!B', dtype_bin)
+    dtype, payload = payload.readlist(['uint:3, bits'])
     return dtype, payload
 
 
@@ -81,9 +76,7 @@ def unpack_float(payload):
     @param {bytes} payload - raw bytes at whose head is float data to
         unpack as per the spec in wire_protocol.md
     """
-    float_sz = calcsize('!d')
-    float_bin, payload = payload[:float_sz], payload[float_sz:]
-    float_value = unpack('!d', float_bin)
+    float_value, payload = payload.readlist(['float:64, bits'])
     return float_value, payload
 
 
@@ -94,9 +87,7 @@ def unpack_boolean(payload):
         unpack as per the spec in wire_protocol.md
     """
 
-    boolean_sz = calcsize('!?')
-    boolean_bin, payload = payload[:boolean_sz], payload[boolean_sz:]
-    boolean_value = unpack('!?', boolean_bin)
+    boolean_value, payload = payload.readlist(['bool', 'bits'])
     return boolean_value, payload
 
 
@@ -107,17 +98,11 @@ def unpack_int(payload):
         unpack as per the spec in wire_protocol.md
     """
     # Calculate the size of the int
-    int_64_flag_sz = calcsize('!?')
-    int_64_flag_bin, payload = payload[
-        :int_64_flag_sz], payload[int_64_flag_sz:]
-    (int_64_flag,) = unpack('!?', int_64_flag_bin)
-    int_unpack_fmt = "!q" if int_64_flag else "!i"
+    int_64_flag, payload = payload.readlist(['bool', 'bits'])
+    int_unpack_fmt = "int:64" if int_64_flag else "int:32"
 
-    int_sz = calcsize(int_unpack_fmt)
-    # Separate the int from any remaining payload
-    num_bin, payload = payload[:int_sz], payload[int_sz:]
-    # Convert the binary data
-    (num,) = unpack(int_unpack_fmt, num_bin)
+    num, payload = payload.readlist([int_unpack_fmt, 'bits'])
+
     # Return the int and any remaining payload
     return num, payload
 
@@ -131,7 +116,7 @@ def unpack_string(payload):
     """Unpacks string and returns it along with the remaining payload"""
     length, payload = unpack_len(payload)
     # Slice the string and the remaining payload
-    string, payload = payload[:length], payload[length:]
+    string, payload = payload[:length*8].tobytes(), payload[length*8:]
     # Return the decoded string and remianing bytes payload
     return string.decode('utf-8'), payload
 
@@ -141,10 +126,8 @@ def unpack_len(payload):
     to a string, list, or dictionary."""
 
     # Calculate the size of the number representing the lenght of the str`
-    len_sz = calcsize('!h')
     # Slice the length of the string from the data and unpack it
-    len_bin, payload = payload[:len_sz], payload[len_sz:]
-    (length,) = unpack('!h', len_bin)
+    length, payload = payload.readlist(['uint:16', 'bits'])
     return length, payload
 
 
@@ -158,7 +141,3 @@ def decode_pair(payload):
 
     value, payload = decode_object(payload)
     return key, value, payload
-
-bstring = b'\x01\x07\x00\x05\x05\x01\x00\x01s\x01\x00\x05hello\x05\x01\x00\x01l\x06\x00\x04\x02\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x01\x02\x00\x00\x00\x00\x02\x02\x00\x00\x00\x00\x03\x05\x01\x00\x01d\x07\x00\x01\x05\x01\x00\x03key\x01\x00\x05value\x05\x01\x00\x01x\x02\x00\x00\x00\x00\x00\x05\x01\x00\x01D\x07\x00\x05\x05\x01\x00\x01s\x01\x00\x05hello\x05\x01\x00\x01l\x06\x00\x04\x02\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x01\x02\x00\x00\x00\x00\x02\x02\x00\x00\x00\x00\x03\x05\x01\x00\x01d\x07\x00\x01\x05\x01\x00\x03key\x01\x00\x05value\x05\x01\x00\x01x\x02\x00\x00\x00\x00\x00\x05\x01\x00\x01D\x07\x00\x05\x05\x01\x00\x01s\x01\x00\x05hello\x05\x01\x00\x01l\x06\x00\x04\x02\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x01\x02\x00\x00\x00\x00\x02\x02\x00\x00\x00\x00\x03\x05\x01\x00\x01d\x07\x00\x01\x05\x01\x00\x03key\x01\x00\x05value\x05\x01\x00\x01x\x02\x00\x00\x00\x00\x00\x05\x01\x00\x01D\x07\x00\x05\x05\x01\x00\x01s\x01\x00\x05hello\x05\x01\x00\x01l\x06\x00\x04\x02\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x01\x02\x00\x00\x00\x00\x02\x02\x00\x00\x00\x00\x03\x05\x01\x00\x01d\x07\x00\x01\x05\x01\x00\x03key\x01\x00\x05value\x05\x01\x00\x01x\x02\x00\x00\x00\x00\x00\x05\x01\x00\x01D\x07\x00\x05\x05\x01\x00\x01s\x01\x00\x05hello\x05\x01\x00\x01l\x06\x00\x04\x02\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x01\x02\x00\x00\x00\x00\x02\x02\x00\x00\x00\x00\x03\x05\x01\x00\x01d\x07\x00\x01\x05\x01\x00\x03key\x01\x00\x05value\x05\x01\x00\x01x\x02\x00\x00\x00\x00\x00\x05\x01\x00\x01D\x07\x00\x04\x05\x01\x00\x01s\x01\x00\x05hello\x05\x01\x00\x01l\x06\x00\x04\x02\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x01\x02\x00\x00\x00\x00\x02\x02\x00\x00\x00\x00\x03\x05\x01\x00\x01d\x07\x00\x01\x05\x01\x00\x03key\x01\x00\x05value\x05\x01\x00\x01x\x02\x00\x00\x00\x00\x00'
-import pprint
-pprint.pprint(decode(bstring))
