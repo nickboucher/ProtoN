@@ -44,7 +44,7 @@ var proton = (function() {
           // Combines built-in encoding functions to achieve UTF-8 encoding
           var utf8 = unescape(encodeURIComponent(str));
           // Prepend string with length
-          bits.writebits(sutf8.length, 16);
+          bits.writebits(utf8.length, 16);
           // Loop through each byte in resulting string and add to bitstring
           for (var i=0; i<utf8.length; i++) {
             bits.writebits(utf8.charCodeAt(i), 8);
