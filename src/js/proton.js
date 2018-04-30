@@ -44,10 +44,7 @@ var proton = (function() {
           // Combines built-in encoding functions to achieve UTF-8 encoding
           var utf8 = unescape(encodeURIComponent(str));
           // Prepend string with length
-          var strlen = Struct.Pack('!H', [utf8.length]);
-          for (var i=0; i<strlen.length; i++) {
-            bits.writebits(strlen[i], 8);
-          }
+          bits.writebits(sutf8.length, 16);
           // Loop through each byte in resulting string and add to bitstring
           for (var i=0; i<utf8.length; i++) {
             bits.writebits(utf8.charCodeAt(i), 8);
@@ -72,14 +69,14 @@ var proton = (function() {
             // Write flag that number is 32-bits
             bits.writebits(0,1);
             // Pack number as 32-bit signed integer
-            var num = Struct.Pack('!i', [obj]);
-            for (var i=0; i<num.length; i++) {
-              bits.writebits(num[i]);
-            }
+            var buf = new DataView(new ArrayBuffer(4));
+            buf.setInt32(0, obj, false);
+            bits.writebits(buf.getUint32(0, false), 32);
           } else {
             // Write flag that number is 64-bits
             bits.writebits(1,1);
             // Pack number as 64-bit signed integer
+            // TODO: Find a way to handle ints between 32-52 bits
             throw new Error("64 bit integers not natively supported.")
           }
           return bits;
@@ -87,19 +84,16 @@ var proton = (function() {
           // Add Float TypeCode
           bits.writebits(codes.PrimFloat, codelen);
           // Pack number as 64-bit signed float
-          var num = Struct.Pack('!d', [obj]);
-          for (var i=0; i<num.length; i++) {
-            bits.writebits(num[i]);
-          }
+          var buf = new DataView(new ArrayBuffer(8));
+          buf.setFloat64(0, obj, false);
+          bits.writebits(buf.getUint32(0, false), 32);
+          bits.writebits(buf.getUint32(4, false), 32);
           return bits;
         } else if (Object.prototype.toString.call(obj) === '[object Array]') {
           // Add List Container TypeCode
           bits.writebits(codes.ConList, codelen);
           // Prepend list with length
-          var listlen = Struct.Pack('!H', [obj.length]);
-          for (var i=0; i<listlen.length; i++) {
-            bits.writebits(listlen[i], 8);
-          }
+          bits.writebits(obj.length, 16);
           // Recursively encode each subcomponent
           for (var i=0; i<obj.length; i++) {
             bits = _encode(obj[i], bits);
@@ -109,10 +103,7 @@ var proton = (function() {
           // Add Object Container TypeCode
           bits.writebits(codes.ConObject, codelen);
           // Prepend object items with length
-          var members = Struct.Pack('!H', [Object.keys(obj).length]);
-          for (var i=0; i<members.length; i++) {
-            bits.writebits(members[i], 8);
-          }
+          bits.writebits(Object.keys(obj).length, 16);
           // Encode each subcomponent
           Object.keys(obj).forEach(function(key) {
               // Add Key-Value pair TypeCode
@@ -137,18 +128,141 @@ var proton = (function() {
       // Write the ProtoN protocol version
       bits.writebits(version, versionlen);
       // Call the recursive function starting with our header-encoded buffer
-      return _encode(obj, bits);
+      return _encode(obj, bits).toString();
     },
 
     /* Decodes the passed `bytestr` using the proton protocol and returns the
      * stored object
      */
-    decode: function(bytestr) {
-      var output = "";
-      for (var i = 0; i < bytestr.length; i++) {
-        output += input[i].charCodeAt(0).toString(2) + " ";
+    decode: function(bitstr) {
+      // Helper function to throw malformed error
+      function malformed() {
+        throw new Error("Malformed ProtoN message.");
       }
-      return {}
+      // Helper function to read one TypeCode
+      function readCode(bits) {
+        return bits.readbits(codelen);
+      }
+      // Hepler function to read one unsigned 16-bit integer
+      function readLen(bits) {
+        return bits.readbits(16);
+      }
+      // Helper function to read strings
+      function readString(bits) {
+        // Get the length of the string in bytes
+        var len = readLen(bits);
+        // Read each UTF-8 encoded byte into string
+        var utf8 = "";
+        for (var i=0; i<len; i++) {
+          utf8 += String.fromCharCode(bits.readbits(8));
+        }
+        // Decode UTF-8 string using built-in decoding function composition
+        return decodeURIComponent(escape(utf8));
+      }
+      // Helper function to determine if element is container (return true)
+      // or not a container (return false) without moving cursor
+      function isCon(bits) {
+        var code = bits.peek(codelen);
+        return (code == codes.ConList || code == codes.ConObject);
+      }
+      // Helper function to decode a primitive
+      function decodePrim(bits) {
+        // Check that element is not Con or Key
+        var code = bits.readbits(codelen);
+        if (code == codes.PrimNull) {
+          // We will return null, but could also return undefined
+          return null;
+        } else if (code == codes.PrimString) {
+          return readString(bits);
+        } else if (code == codes.PrimInt) {
+          // Read boolean specifying whether int32 or int64
+          var is64Bit = !!(bits.readbits(1));
+          if (is64Bit) {
+            // Integer value is 64 bits in length
+            // TODO: Find a way to handle ints between 32-52 bits
+            throw new Error("64 bit integers not natively supported.")
+          } else {
+            var num = bits.readbits(32);
+            var buf = new DataView(new ArrayBuffer(4));
+            buf.setUint32(0, num, false);
+            return buf.getInt32(0, false);
+          }
+        } else if (code == codes.PrimFloat) {
+          // Pack bits into buffer
+          var buf = new DataView(new ArrayBuffer(8));
+          for (var i=0; i<2; i++) {
+            buf.setUint32((4*i), bits.readbits(32), false);
+          }
+          // Interpret buffer as 64-bit float
+          return buf.getFloat64(0, false);
+        } else if (code == codes.PrimBool) {
+          // Double-not casts number to boolean
+          return !!(bits.readbits(1));
+        } else {
+          malformed();
+        }
+      }
+      // Helper function to decode a container
+      function decodeCon(bits) {
+        var code = readCode(bits);
+        if (code == codes.ConList) {
+          // This is the start of a list
+          // Get the length of the list
+          var len = readLen(bits);
+          // Create the list
+          var list = [];
+          // Process each element of the list
+          for (var i=0; i<len; i++) {
+            if (isCon(bits)) {
+              // The element is another container
+              list.push(decodeCon(bits));
+            } else {
+              // The element is a primitive
+              list.push(decodePrim(bits));
+            }
+          }
+          // Return the constructed list
+          return list;
+        } else if (code == codes.ConObject) {
+          // This is the start of an object
+          // Get the number of object members
+          var members = readLen(bits);
+          // Create the list
+          var obj = {}
+          // Process each member of the object
+          for (var i=0; i<members; i++) {
+            // Ensure that each element of the object is correctly
+            // encoded as a key-value pair
+            if (bits.readbits(codelen) != codes.ConPair) {
+              malformed();
+            }
+            // Read the key of the member
+            var key = readString(bits);
+            // Decode and set the member
+            if (isCon(bits)) {
+              // The element is another container
+              obj[key] = decodeCon(bits);
+            } else {
+              // The element is a primitive
+              obj[key] = decodePrim(bits);
+            }
+          }
+          // Return the constructed object
+          return obj;
+        } else {
+          malformed();
+        }
+      }
+      // Interpret the argument as a sequence of bits
+      var bits = new BitString(bitstr);
+      // Move to the start of the bit string
+      bits.seek(0);
+      // Verify that the protocol version matches
+      if (bits.readbits(2) != version) {
+        throw new Error("Unsupported ProtoN version.");
+      }
+      // Root element must be a container
+      return decodeCon(bits);
     }
 
   };
