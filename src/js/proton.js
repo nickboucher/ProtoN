@@ -184,8 +184,23 @@ var proton = (function() {
           var is64Bit = !!(bits.readbits(1));
           if (is64Bit) {
             // Integer value is 64 bits in length
-            // TODO: Find a way to handle ints between 32-52 bits
-            throw new Error("64 bit integers not natively supported.")
+            // Read into buffer
+            var buf = new DataView(new ArrayBuffer(8));
+            for (var i=0; i<4; i++) {
+              buf.setUint16((2*i), bits.readbits(16), false);
+            }
+            // Thanks to Yusuke Kawasaki for the algorithm
+            // (https://github.com/kawanet/int64-buffer)
+            const BIT32 = 4294967296;
+            var high = buf.getInt32(0, false);
+            // JS can only handle integers up to 32 bits, so we will return
+            // Infinity for values greater than we can handle
+            if (high > 0xFFFFF) {
+              return Infinity;
+            }
+            var low = buf.getInt32(4, false);
+            high |= 0; // a trick to get signed
+            return high ? (high * BIT32 + low) : low;
           } else {
             var buf = new DataView(new ArrayBuffer(4));
             for (var i=0; i<2; i++) {
