@@ -48,6 +48,7 @@ Network Byte Order (Big-Endian)
 - `ConList`'s OpCode is followed by the number of 1st-level `Prim`|`Con` it contains and then the same number of subsequent Container or Primitive values
 - `ConObject`s OpCode is followed by the number of 1st-level `Key` it contains and then the same number of subsequent Key values
 - Each message starts with a version number and is immediately followed by exactly one Container
+- Strings are immediately followed by the length of the UTF-8 encoded string in bytes, then followed by the encoded string itself
 
 ## Wire Buffer Structure
 
