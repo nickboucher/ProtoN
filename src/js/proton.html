@@ -8,5 +8,18 @@
   <body>
     <h1>ProtoN</h1>
     <i>Use the console to experiment with ProtoN.</i>
+    <br />
+    <h3>API</h3>
+    <p>There are two functions exposed globally by the ProtoN module:</p>
+    <ul>
+      <li>
+        <code>proton.encode(obj)</code> &mdash; takes a list or dictionary "obj"
+        and returns the ProtoN encoding wrapped in a string
+      </li>
+      <li>
+        <code>proton.decode(str)</code> &mdash; takes a ProtoN encoding wrapped
+        in a string and returns the decoded object
+      </li>
+    </ul>
   </body>
 </html>
