@@ -29,6 +29,8 @@ var proton = (function() {
 
   // Maximum signed 32-bit number (2^31-1)
   const max32 = 2147483647
+  // Constant for accessing high 32-bits of 64-bit ints (2^32)
+  const BIT32 = 4294967296;
 
   // Use JS module syntax
   return {
@@ -79,8 +81,12 @@ var proton = (function() {
             // Write flag that number is 64-bits
             bits.writebits(1,1);
             // Pack number as 64-bit signed integer
-            // TODO: Find a way to handle ints between 32-52 bits
-            throw new Error("64 bit integers not natively supported.")
+            var low = obj & (0xFFFFFFFF);
+            var high = (obj - low) / BIT32;
+            var bitArr = [high>>>16, high&(0xFFFF), low>>>16, low&(0xFFFF)];
+            for (var i=0; i<bitArr.length; i++) {
+              bits.writebits(bitArr[i], 16);
+            }
           }
           return bits;
         } else if (typeof(obj) === 'number') {
@@ -191,7 +197,6 @@ var proton = (function() {
             }
             // Thanks to Yusuke Kawasaki for the algorithm
             // (https://github.com/kawanet/int64-buffer)
-            const BIT32 = 4294967296;
             var high = buf.getInt32(0, false);
             // JS can only handle integers up to 32 bits, so we will return
             // Infinity for values greater than we can handle
