@@ -6,10 +6,11 @@ from collections import Mapping, Set, Sequence
 from bitstring import BitStream, Bits
 
 string_types = (str, bytes)
-primitive_types = (int, str, float, type(None))
+primitive_types = (int, str, float, bool, type(None))
 
 def pack_message(bytelist):
     bytelist.insert(0, BitStream(uint=PROTOCOL_VERSION, length=2))
+
     return Bits().join(bytelist)
 
 def encode_variable(data):
@@ -19,21 +20,20 @@ def encode_variable(data):
     @param data - the data to pack"""
     if data is None:
         return pack_type(TYPE_NULL)
-    if isinstance(data, str):
+    elif isinstance(data, bool):
+        return pack_bool(data)
+    elif isinstance(data, str):
         utf = data.encode('utf-8')
         utflen = len(utf)
         return pack_type(TYPE_STRING) + pack_len(utflen) + utf
-    if isinstance(data, int):
+    elif isinstance(data, int):
         if abs(data) < (2**31 - 1):
             return pack_type(TYPE_INT) + pack_bool(False) + BitStream(int=data, length=32)
 
         else:
             return pack_type(TYPE_INT) + pack_bool(True) + BitStream(int=data, length=64)
-    if isinstance(data, float):
+    elif isinstance(data, float):
         return pack_type(TYPE_FLOAT) + pack('d', data)
-
-    if isinstance(data, boolean):
-        return pack_bool(boolean)
 
     else:
         raise TypeError("Wire protocol does not support this data type. \
@@ -43,7 +43,8 @@ def encode_object(obj, bytelist, memo=None):
         memo = set()
 
     if isinstance(obj, primitive_types):
-        bytelist.append(encode_variable(obj))
+        encoding = encode_variable(obj)
+        bytelist.append(encoding)
     elif isinstance(obj, Mapping):
         if id(obj) not in memo:
             memo.add(id(obj))
@@ -73,7 +74,7 @@ def pack_type(dtype):
 def pack_len(length):
     return BitStream(uint=length, length=16)
 def pack_bool(boolean):
-    return BitStream('0b1') if boolean else BitStream('0b0')
+    return BitStream(uint=1, length=1) if boolean else BitStream(uint=0, length=1)
 def encode(data):
     bytelist = []
     encode_object(data, bytelist)
