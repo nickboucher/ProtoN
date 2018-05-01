@@ -187,16 +187,17 @@ var proton = (function() {
             // TODO: Find a way to handle ints between 32-52 bits
             throw new Error("64 bit integers not natively supported.")
           } else {
-            var num = bits.readbits(32);
             var buf = new DataView(new ArrayBuffer(4));
-            buf.setUint32(0, num, false);
+            for (var i=0; i<2; i++) {
+              buf.setUint16((2*i), bits.readbits(16), false);
+            }
             return buf.getInt32(0, false);
           }
         } else if (code == codes.PrimFloat) {
           // Pack bits into buffer
           var buf = new DataView(new ArrayBuffer(8));
-          for (var i=0; i<2; i++) {
-            buf.setUint32((4*i), bits.readbits(32), false);
+          for (var i=0; i<4; i++) {
+            buf.setUint16((2*i), bits.readbits(16), false);
           }
           // Interpret buffer as 64-bit float
           return buf.getFloat64(0, false);
