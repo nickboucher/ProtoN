@@ -71,7 +71,10 @@ var proton = (function() {
             // Pack number as 32-bit signed integer
             var buf = new DataView(new ArrayBuffer(4));
             buf.setInt32(0, obj, false);
-            bits.writebits(buf.getUint32(0, false), 32);
+            // Due to JS bitwise constraints, can't pack more than 16 bits at once
+            for (var i=0; i<4; i+=2) {
+              bits.writebits(buf.getUint16(i, false), 16);
+            }
           } else {
             // Write flag that number is 64-bits
             bits.writebits(1,1);
@@ -86,8 +89,10 @@ var proton = (function() {
           // Pack number as 64-bit signed float
           var buf = new DataView(new ArrayBuffer(8));
           buf.setFloat64(0, obj, false);
-          bits.writebits(buf.getUint32(0, false), 32);
-          bits.writebits(buf.getUint32(4, false), 32);
+          // Due to JS bitwise constraints, can't pack more than 16 bits at once
+          for (var i=0; i<8; i+=2) {
+            bits.writebits(buf.getUint16(i, false), 16);
+          }
           return bits;
         } else if (Object.prototype.toString.call(obj) === '[object Array]') {
           // Add List Container TypeCode
