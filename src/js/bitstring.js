@@ -169,10 +169,11 @@ BitString = (function(){
     return size ? bits : null;
   };
   prototype.peek = function(n){
-    var offset, size, bits, byte;
+    var offset, size, bits, byte, pos;
     offset = 0;
     size = this._peeklen;
     bits = this._peek;
+    pos = this._pos;
     while (size < n) {
       byte = this._nextbyte();
       if (byte == null) {
@@ -189,7 +190,7 @@ BitString = (function(){
       bits >>= size - n;
     }
     if (offset) {
-      this._bufseek(-offset, SEEK_RELATIVE);
+      this._bufseek(pos);
     }
     return bits;
   };
