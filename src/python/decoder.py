@@ -21,7 +21,8 @@ def decode_version(payload):
 
 def decode_object(payload):
     assert(payload is not None)
-    assert(len(payload) > 0)
+    if len(payload) == 0:
+        return
     dtype, payload = unpack_dtype(payload)
     # print('dtype:', dtype, 'payload:', payload[:8])
 
@@ -46,6 +47,7 @@ def decode_object(payload):
 def unpack_dtype(payload):
     """Reads the type of data stipulated at the head of a bytestring"""
     dtype, payload = payload.readlist(['uint:3, bits'])
+#     print("unpacked dtype", dtype)
     return dtype, payload
 
 
@@ -133,11 +135,11 @@ def unpack_len(payload):
 
 def decode_pair(payload):
     dtype, payload = unpack_dtype(payload)
+#     print('dtype_pair:', dtype)
     assert(dtype == TYPE_PAIR)
-
     dtype, payload = unpack_dtype(payload)
+#     print('dtype_key:', dtype)
     assert(dtype == TYPE_STRING)
     key, payload = unpack_string(payload)
-
     value, payload = decode_object(payload)
     return key, value, payload

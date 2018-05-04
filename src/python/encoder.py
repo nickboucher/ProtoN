@@ -19,21 +19,26 @@ def encode_variable(data):
     int, str, float, boolean, None.
     @param data - the data to pack"""
     if data is None:
+#         print('packing null')
         return pack_type(TYPE_NULL)
     elif isinstance(data, bool):
-        return pack_bool(data)
+#         print('packing bool')
+        return pack_type(TYPE_BOOL) + pack_bool(data)
     elif isinstance(data, str):
+#         print('packing string')
         utf = data.encode('utf-8')
         utflen = len(utf)
         return pack_type(TYPE_STRING) + pack_len(utflen) + utf
     elif isinstance(data, int):
+#         print('packing int')
         if abs(data) < (2**31 - 1):
             return pack_type(TYPE_INT) + pack_bool(False) + BitStream(int=data, length=32)
 
         else:
             return pack_type(TYPE_INT) + pack_bool(True) + BitStream(int=data, length=64)
     elif isinstance(data, float):
-        return pack_type(TYPE_FLOAT) + pack('d', data)
+#         print('packing float')
+        return pack_type(TYPE_FLOAT) + BitStream(float=data, length=64)
 
     else:
         raise TypeError("Wire protocol does not support this data type. \
