@@ -11,7 +11,7 @@ primitive_types = (int, str, float, bool, type(None))
 def pack_message(bytelist):
     bytelist.insert(0, BitStream(uint=PROTOCOL_VERSION, length=2))
 
-    return Bits().join(bytelist).bytes
+    return Bits().join(bytelist).tobytes()
 
 def encode_variable(data):
     """Infers the type of data, then packs it into a network-order
