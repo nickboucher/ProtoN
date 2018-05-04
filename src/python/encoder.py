@@ -12,6 +12,10 @@ def pack_message(bytelist):
     bytelist.insert(0, BitStream(uint=PROTOCOL_VERSION, length=2))
 
     return Bits().join(bytelist).tobytes()
+def encode_key(data):
+    utf = data.encode('utf-8')
+    utflen = len(utf)
+    return pack_len(utflen) + utf
 
 def encode_variable(data):
     """Infers the type of data, then packs it into a network-order
@@ -59,7 +63,7 @@ def encode_object(obj, bytelist, memo=None):
         for key, value in obj.items():
             assert(isinstance(key, str))
             bytelist.append(pack_type(TYPE_PAIR))
-            bytelist.append(encode_variable(key))
+            bytelist.append(encode_key(key))
             encode_object(value, bytelist, memo)
         memo.remove(id(obj))
     elif isinstance(obj, (Sequence, Set)) and not isinstance(obj, string_types):

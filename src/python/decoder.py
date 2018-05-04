@@ -137,9 +137,6 @@ def decode_pair(payload):
     dtype, payload = unpack_dtype(payload)
 #     print('dtype_pair:', dtype)
     assert(dtype == TYPE_PAIR)
-    dtype, payload = unpack_dtype(payload)
-#     print('dtype_key:', dtype)
-    assert(dtype == TYPE_STRING)
     key, payload = unpack_string(payload)
     value, payload = decode_object(payload)
     return key, value, payload
