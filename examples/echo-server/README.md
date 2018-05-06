@@ -9,6 +9,6 @@ flask run
 Proton's functionality can then be tested from the JS console with:
 
 ```js
-proton.get('http://localhost:5000/echo', {'Hello': 'World'}, console.log);<br />
+proton.get('http://localhost:5000/echo', {'Hello': 'World'}, console.log);
 proton.post('http://localhost:5000/echo', {'Hello World': true}, console.log);
 ```
