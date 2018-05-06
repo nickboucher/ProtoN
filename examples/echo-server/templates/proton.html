@@ -7,6 +7,24 @@
     <h1>ProtoN</h1>
     <i>Use the console to experiment with ProtoN.</i>
     <br />
+    <h3>Echo Server</h3>
+    <p>The echo server can be tested by the following commands from a *nix CLI:
+      <br />
+      <br />
+      <code>
+        export FLASK_APP=server.py<br />
+        flask run
+      </code>
+    </p>
+    <p>Proton's functionality can then be tested from the console with:
+      <br />
+      <br />
+      <code>
+        proton.get('http://localhost:5000/echo', {'Hello': 'World'}, console.log);<br />
+        proton.post('http://localhost:5000/echo', {'Hello World': true}, console.log);
+      </code>
+    </p>
+    <br />
     <h3>API</h3>
     <p>There are two functions exposed globally by the ProtoN module:</p>
     <ul>
