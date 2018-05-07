@@ -31,7 +31,7 @@ Network Byte Order (Big-Endian)
 - **PrimNull**: *0o0*
 - **PrimString**: *0o1* <String\>
 - **PrimInt**: *0o2* <uint2, int8|int16|int32|int64\>
-- **PrimFloat**: *0o3* <bool, String|float64\>
+- **PrimFloat**: *0o3* <bool, ShortStr|float64\>
 - **PrimBool**: *0o4* <bool\>
 
 ### Keys (Key)
