@@ -1,9 +1,9 @@
 
 # Wire Protocol
 
-## Proposed Name
+## Name
 
-Nicholas proposes naming the project `ProtoN`, standing for "protocol nimble" and pronounced *proton*.
+This wire protocol shall be named `ProtoN`, standing for "protocol nimble" and pronounced *proton*.
 
 ## Representation Notes
 
@@ -16,14 +16,12 @@ Nicholas proposes naming the project `ProtoN`, standing for "protocol nimble" an
 Network Byte Order (Big-Endian)
 
 ### Encodings
-- int64: 64-bit signed integer
-- int32: 32-bit signed integer
-- int16: 16-bit signed integer
-- int8: 8-bit signed integer
-- sz: 2-bit unsigned integer
+- int*n*: *n*-bit signed integer
+- uint*n*: *n*-bit unsigned integer
 - float64: IEEE 754 64-bit signed floating point number
 - bool: 1-bit encoding of boolean values {0b0: `False`; 0b1: `True`}
 - String: <len, UTF-8 encoded string>
+- ShortStr: <uint3, UTF-8 encoded string>
 - len: 16-bit unsigned integer
 
 ## OpCodes
@@ -32,8 +30,8 @@ Network Byte Order (Big-Endian)
 
 - **PrimNull**: *0o0*
 - **PrimString**: *0o1* <String\>
-- **PrimInt**: *0o2* <sz, int8|int16|int32|int64\>
-- **PrimFloat**: *0o3* <bool, float64|String\>
+- **PrimInt**: *0o2* <uint2, int8|int16|int32|int64\>
+- **PrimFloat**: *0o3* <bool, String|float64\>
 - **PrimBool**: *0o4* <bool\>
 
 ### Keys (Key)
