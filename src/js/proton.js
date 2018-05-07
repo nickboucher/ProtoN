@@ -27,6 +27,10 @@ var proton = (function() {
   const version = 0x1;
   const versionlen = 2;
 
+  // Maximum signed 8-bit number (2^7-1)
+  const max8 = 127
+  // Maximum signed 16-bit number (2^15-1)
+  const max16 = 32767
   // Maximum signed 32-bit number (2^31-1)
   const max32 = 2147483647
   // Constant for accessing high 32-bits of 64-bit ints (2^32)
@@ -321,9 +325,25 @@ var proton = (function() {
       } else if (Number.isInteger(obj)) {
         // Add Int TypeCode
         bits.writebits(codes.PrimInt, codelen);
-        if (Math.abs(obj) < max32) {
+        // Absolute value of number to write
+        var abs = Math.abs(obj);
+        if (abs <= max8) {
+          // Write flag that number is 8-bits
+          bits.writebits(0,2);
+          // Pack number as 8-bit signed integer
+          var buf = new DataView(new ArrayBuffer(1));
+          buf.setInt8(0, obj, false);
+          bits.writebits(buf.getUint8(0, false), 8);
+        } else if (abs <= max16) {
+          // Write flag that number is 16-bits
+          bits.writebits(1,2);
+          // Pack number as 16-bit signed integer
+          var buf = new DataView(new ArrayBuffer(2));
+          buf.setInt16(0, obj, false);
+          bits.writebits(buf.getUint16(0, false), 16);
+        } else if (abs <= max32) {
           // Write flag that number is 32-bits
-          bits.writebits(0,1);
+          bits.writebits(2,2);
           // Pack number as 32-bit signed integer
           var buf = new DataView(new ArrayBuffer(4));
           buf.setInt32(0, obj, false);
@@ -333,7 +353,7 @@ var proton = (function() {
           }
         } else {
           // Write flag that number is 64-bits
-          bits.writebits(1,1);
+          bits.writebits(3,2);
           // Pack number as 64-bit signed integer
           var low = obj & (0xFFFFFFFF);
           var high = (obj - low) / BIT32;
@@ -462,9 +482,9 @@ var proton = (function() {
       } else if (code == codes.PrimString) {
         return readString(bits);
       } else if (code == codes.PrimInt) {
-        // Read boolean specifying whether int32 or int64
-        var is64Bit = !!(bits.readbits(1));
-        if (is64Bit) {
+        // Read value giving number of bits for int encoding
+        var bitlen = Math.pow(2, bits.readbits(2) + 3);
+        if (bitlen == 64) {
           // Integer value is 64 bits in length
           // Read into buffer
           var buf = new DataView(new ArrayBuffer(8));
@@ -483,11 +503,20 @@ var proton = (function() {
           high |= 0; // a trick to get signed
           return high ? (high * BIT32 + low) : low;
         } else {
-          var buf = new DataView(new ArrayBuffer(4));
-          for (var i=0; i<2; i++) {
-            buf.setUint16((2*i), bits.readbits(16), false);
+          var bytes = bitlen/8;
+          var buf = new DataView(new ArrayBuffer(bytes));
+          for (var i=0; i<bytes; i++) {
+            buf.setUint8(i, bits.readbits(8), false);
           }
-          return buf.getInt32(0, false);
+          if (bitlen == 8) {
+            return buf.getInt8(0, false);
+          } else if (bitlen == 16) {
+            return buf.getInt16(0, false);
+          } else if (bitlen == 32) {
+            return buf.getInt32(0, false);
+          } else {
+            malformed();
+          }
         }
       } else if (code == codes.PrimFloat) {
         // Read boolean specifying whether String or IEEE 754 format
