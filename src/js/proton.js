@@ -33,6 +33,8 @@ var proton = (function() {
   const max16 = 32767
   // Maximum signed 32-bit number (2^31-1)
   const max32 = 2147483647
+  // Maximum signed 64-bit number (2^63-1)
+  const max64 = 9223372036854775807;
   // Constant for accessing high 32-bits of 64-bit ints (2^32)
   const BIT32 = 4294967296;
 
@@ -351,7 +353,7 @@ var proton = (function() {
           for (var i=0; i<4; i+=2) {
             bits.writebits(buf.getUint16(i, false), 16);
           }
-        } else {
+        } else if (abs <= max64){
           // Write flag that number is 64-bits
           bits.writebits(3,2);
           // Pack number as 64-bit signed integer
@@ -361,6 +363,8 @@ var proton = (function() {
           for (var i=0; i<bitArr.length; i++) {
             bits.writebits(bitArr[i], 16);
           }
+        } else {
+          throw new Error("Cannot encode intergers greater than 64 bits.");
         }
         return bits;
       } else if (typeof(obj) === 'number') {
