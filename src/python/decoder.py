@@ -3,7 +3,6 @@
 from constants import *
 from struct import pack, unpack, calcsize
 from bitstring import Bits, BitStream
-
 primitive_type_codes = set([TYPE_NULL, TYPE_BOOL, TYPE_INT, TYPE_STRING, TYPE_FLOAT])
 
 
@@ -78,7 +77,12 @@ def unpack_float(payload):
     @param {bytes} payload - raw bytes at whose head is float data to
         unpack as per the spec in wire_protocol.md
     """
-    float_value, payload = payload.readlist(['float:64, bits'])
+    is_float64, payload = unpack_boolean(payload)
+    if is_float64:
+        float_value, payload = payload.readlist(['float:64, bits'])
+    else:
+        float_str, payload = unpack_string(payload, short=True)
+        float_value = float(float_str)
     return float_value, payload
 
 
@@ -100,10 +104,11 @@ def unpack_int(payload):
         unpack as per the spec in wire_protocol.md
     """
     # Calculate the size of the int
-    int_64_flag, payload = payload.readlist(['bool', 'bits'])
-    int_unpack_fmt = "int:64" if int_64_flag else "int:32"
+    sz, payload = payload.readlist(['uint:2', 'bits'])
+    sz = 2**(sz + 3)
+    int_fmt = 'int:' + str(sz)
 
-    num, payload = payload.readlist([int_unpack_fmt, 'bits'])
+    num, payload = payload.readlist([int_fmt, 'bits'])
 
     # Return the int and any remaining payload
     return num, payload
@@ -114,22 +119,24 @@ def unpack_null(payload):
     return None, payload
 
 
-def unpack_string(payload):
+def unpack_string(payload, short=False):
     """Unpacks string and returns it along with the remaining payload"""
-    length, payload = unpack_len(payload)
+    length, payload = unpack_len(payload, short)
     # Slice the string and the remaining payload
     string, payload = payload[:length*8].tobytes(), payload[length*8:]
     # Return the decoded string and remianing bytes payload
     return string.decode('utf-8'), payload
 
 
-def unpack_len(payload):
+def unpack_len(payload, short=False):
     """Unpacks a len-headed block of data, such as that which corresponds
     to a string, list, or dictionary."""
 
     # Calculate the size of the number representing the lenght of the str`
     # Slice the length of the string from the data and unpack it
-    length, payload = payload.readlist(['uint:16', 'bits'])
+    sz = 16 if not short else 3
+    fmt_str = "uint:" + str(sz)
+    length, payload = payload.readlist([fmt_str, 'bits'])
     return length, payload
 
 

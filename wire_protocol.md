@@ -1,9 +1,9 @@
 
 # Wire Protocol
 
-## Proposed Name
+## Name
 
-Nicholas proposes naming the project `ProtoN`, standing for "protocol nimble" and pronounced *proton*.
+This wire protocol shall be named `ProtoN`, standing for "protocol nimble" and pronounced *proton*.
 
 ## Representation Notes
 
@@ -16,12 +16,13 @@ Nicholas proposes naming the project `ProtoN`, standing for "protocol nimble" an
 Network Byte Order (Big-Endian)
 
 ### Encodings
-- int64: 64-bit signed integer
+- int*n*: *n*-bit signed integer
+- uint*n*: *n*-bit unsigned integer
 - float64: IEEE 754 64-bit signed floating point number
-- int32: 32-bit signed integer
 - bool: 1-bit encoding of boolean values {0b0: `False`; 0b1: `True`}
-- len: unsigned 16-bit integer
 - String: <len, UTF-8 encoded string>
+- ShortStr: <uint3, UTF-8 encoded string>
+- len: 16-bit unsigned integer
 
 ## OpCodes
 
@@ -29,8 +30,8 @@ Network Byte Order (Big-Endian)
 
 - **PrimNull**: *0o0*
 - **PrimString**: *0o1* <String\>
-- **PrimInt**: *0o2* <bool, int32|int64\>
-- **PrimFloat**: *0o3* <float64\>
+- **PrimInt**: *0o2* <uint2, int8|int16|int32|int64\>
+- **PrimFloat**: *0o3* <bool, ShortStr|float64\>
 - **PrimBool**: *0o4* <bool\>
 
 ### Keys (Key)
@@ -43,9 +44,10 @@ Network Byte Order (Big-Endian)
 ## Notes
 
 - Primitives must be held in some container and cannot stand on their own.
-- `PrimInt`'s and `PrimFloat`'s are both immediately followed by a bool which is True if the subsequent number is 64-bits in length and False if the subsequent number is 32-bits in length
-- `ConPair`'s OpCode is followed by a string (it's key) and then the OpCode of another Container or a Primitive (it's value)
-- `ConList`'s OpCode is followed by the number of 1st-level `Prim`|`Con` it contains and then the same number of subsequent Container or Primitive values
+- `PrimInt`s are encoded as a 2-bit size value `sz` followed by a `2^(sz+3)`-bit signed integer.
+- `PrimFloat`s are encoded as a bool b, followed by either (if b) a float64 or (if not b) a String representation of the float
+- `ConPair`s OpCode is followed by a string (it's key) and then the OpCode of another Container or a Primitive (it's value)
+- `ConList`s OpCode is followed by the number of 1st-level `Prim`|`Con` it contains and then the same number of subsequent Container or Primitive values
 - `ConObject`s OpCode is followed by the number of 1st-level `Key` it contains and then the same number of subsequent Key values
 - Each message starts with a version number and is immediately followed by exactly one Container
 - Strings are immediately followed by the length of the UTF-8 encoded string in bytes, then followed by the encoded string itself

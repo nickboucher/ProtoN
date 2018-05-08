@@ -1,6 +1,8 @@
 from flask import Flask, request, render_template, Response
-from decoder import *
-from encoder import *
+import sys
+sys.path.append('../../src/python')
+from decoder import decode
+from encoder import encode
 
 app = Flask(__name__)
 
