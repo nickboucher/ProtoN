@@ -308,9 +308,9 @@ var proton = (function() {
         return bits;
       }
       // Helper function to write String
-      function writeString(str, bits) {_writeString(str,bits,16);}
+      function writeString(str, bits) {return _writeString(str,bits,16);}
       // Helper function to write ShortStr
-      function writeShortStr(str, bits) {_writeString(str,bits,3);}
+      function writeShortStr(str, bits) {return _writeString(str,bits,3);}
       // Find the proton type of the passed variable
       if (obj === null || obj === undefined) {
         return bits.writebits(codes.PrimNull, codelen);
