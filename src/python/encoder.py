@@ -8,14 +8,18 @@ from bitstring import BitStream, Bits
 string_types = (str, bytes)
 primitive_types = (int, str, float, bool, type(None))
 
+
 def pack_message(bytelist):
     bytelist.insert(0, BitStream(uint=PROTOCOL_VERSION, length=2))
 
     return Bits().join(bytelist).tobytes()
+
+
 def encode_key(data):
     utf = data.encode('utf-8')
     utflen = len(utf)
     return pack_len(utflen) + utf
+
 
 def encode_variable(data):
     """Infers the type of data, then packs it into a network-order
@@ -23,18 +27,18 @@ def encode_variable(data):
     int, str, float, boolean, None.
     @param data - the data to pack"""
     if data is None:
-#         print('packing null')
+        #         print('packing null')
         return pack_type(TYPE_NULL)
     elif isinstance(data, bool):
-#         print('packing bool')
+        #         print('packing bool')
         return pack_type(TYPE_BOOL) + pack_bool(data)
     elif isinstance(data, str):
-#         print('packing string')
+        #         print('packing string')
         utf = data.encode('utf-8')
         utflen = len(utf)
         return pack_type(TYPE_STRING) + pack_len(utflen) + utf
     elif isinstance(data, int):
-#         print('packing int')
+        #         print('packing int')
         if abs(data) < (2**7 - 1):
             return pack_type(TYPE_INT) + BitStream(uint=0, length=2) + BitStream(int=data, length=8)
         if abs(data) < (2**15 - 1):
@@ -46,12 +50,20 @@ def encode_variable(data):
         else:
             raise ValueError("int values outside +/- 2**63 are not supported.")
     elif isinstance(data, float):
-#         print('packing float')
-        return pack_type(TYPE_FLOAT) + BitStream(float=data, length=64)
+        #         print('packing float')
+        if len(str(data)) < 8:
+            utf = data.encode('utf-8')
+            utflen = len(utf)
+            assert(utflen < 8)
+            return pack_type(TYPE_FLOAT) + pack_bool(False) + pack_len(utflen, short=True) + utf
+        else:
+            return pack_type(TYPE_FLOAT) + pack_bool(True) + BitStream(float=data, length=64)
 
     else:
         raise TypeError("Wire protocol does not support this data type. \
         Expected: int, str, float, None. Got:", type(data))
+
+
 def encode_object(obj, bytelist, memo=None):
     if memo is None:
         memo = set()
@@ -63,7 +75,8 @@ def encode_object(obj, bytelist, memo=None):
         if id(obj) not in memo:
             memo.add(id(obj))
         else:
-            raise ValueError("ProtoN does not support circular references within objects")
+            raise ValueError(
+                "ProtoN does not support circular references within objects")
         bytelist.extend([pack_type(TYPE_OBJECT), pack_len(len(obj.items()))])
         for key, value in obj.items():
             assert(isinstance(key, str))
@@ -75,7 +88,8 @@ def encode_object(obj, bytelist, memo=None):
         if id(obj) not in memo:
             memo.add(id(obj))
         else:
-            raise ValueError("ProtoN does not support circular references within objects")
+            raise ValueError(
+                "ProtoN does not support circular references within objects")
         bytelist.extend([pack_type(TYPE_LIST), pack_len(len(obj))])
         for elt in obj:
             encode_object(elt, bytelist, memo)
@@ -83,12 +97,21 @@ def encode_object(obj, bytelist, memo=None):
 
     elif hasattr(obj, '__dict__'):
         encode_object(vars(obj), bytelist)
+
+
 def pack_type(dtype):
     return BitStream(uint=dtype, length=3)
-def pack_len(length):
-    return BitStream(uint=length, length=16)
+
+
+def pack_len(length, short=False):
+    sz = 16 if not short else 3
+    return BitStream(uint=length, length=sz)
+
+
 def pack_bool(boolean):
     return BitStream(uint=1, length=1) if boolean else BitStream(uint=0, length=1)
+
+
 def encode(data):
     bytelist = []
     encode_object(data, bytelist)

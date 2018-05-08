@@ -78,7 +78,12 @@ def unpack_float(payload):
     @param {bytes} payload - raw bytes at whose head is float data to
         unpack as per the spec in wire_protocol.md
     """
-    float_value, payload = payload.readlist(['float:64, bits'])
+    is_float64, payload = unpack_boolean(payload)
+    if is_float64:
+        float_value, payload = payload.readlist(['float:64, bits'])
+    else:
+        float_str, payload = unpack_string(payload)
+        float_value = float(float_str)
     return float_value, payload
 
 
