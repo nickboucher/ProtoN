@@ -100,8 +100,9 @@ def unpack_int(payload):
         unpack as per the spec in wire_protocol.md
     """
     # Calculate the size of the int
-    int_64_flag, payload = payload.readlist(['bool', 'bits'])
-    int_unpack_fmt = "int:64" if int_64_flag else "int:32"
+    sz, payload = payload.readlist(['uint:2', 'bits'])
+    sz = 2**(sz + 3)
+    int_fmt = 'int:' + str(sz)
 
     num, payload = payload.readlist([int_unpack_fmt, 'bits'])
 

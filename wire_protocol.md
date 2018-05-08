@@ -44,7 +44,7 @@ Network Byte Order (Big-Endian)
 ## Notes
 
 - Primitives must be held in some container and cannot stand on their own.
-- `PrimInt`s are encoded as a 2-bit size value `sz` followed by a `2^(sz+3)`-bit integer.
+- `PrimInt`s are encoded as a 2-bit size value `sz` followed by a `2^(sz+3)`-bit signed integer.
 - `PrimFloat`s are encoded as a bool b, followed by either (if b) a float64 or (if not b) a String representation of the float
 - `ConPair`s OpCode is followed by a string (it's key) and then the OpCode of another Container or a Primitive (it's value)
 - `ConList`s OpCode is followed by the number of 1st-level `Prim`|`Con` it contains and then the same number of subsequent Container or Primitive values

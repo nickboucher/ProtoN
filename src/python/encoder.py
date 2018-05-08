@@ -35,11 +35,16 @@ def encode_variable(data):
         return pack_type(TYPE_STRING) + pack_len(utflen) + utf
     elif isinstance(data, int):
 #         print('packing int')
+        if abs(data) < (2**7 - 1):
+            return pack_type(TYPE_INT) + BitStream(uint=0, length=2) + BitStream(int=data, length=8)
+        if abs(data) < (2**15 - 1):
+            return pack_type(TYPE_INT) + BitStream(uint=1, length=2) + BitStream(int=data, length=16)
         if abs(data) < (2**31 - 1):
-            return pack_type(TYPE_INT) + pack_bool(False) + BitStream(int=data, length=32)
-
+            return pack_type(TYPE_INT) + BitStream(uint=2, length=2) + BitStream(int=data, length=32)
+        if abs(data) < (2**63 - 1):
+            return pack_type(TYPE_INT) + BitStream(uint=3, length=2) + BitStream(int=data, length=64)
         else:
-            return pack_type(TYPE_INT) + pack_bool(True) + BitStream(int=data, length=64)
+            raise ValueError("int values outside +/- 2**63 are not supported.")
     elif isinstance(data, float):
 #         print('packing float')
         return pack_type(TYPE_FLOAT) + BitStream(float=data, length=64)
