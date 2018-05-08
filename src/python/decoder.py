@@ -3,7 +3,6 @@
 from constants import *
 from struct import pack, unpack, calcsize
 from bitstring import Bits, BitStream
-
 primitive_type_codes = set([TYPE_NULL, TYPE_BOOL, TYPE_INT, TYPE_STRING, TYPE_FLOAT])
 
 
