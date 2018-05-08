@@ -50,7 +50,6 @@ def encode_variable(data):
         else:
             raise ValueError("int values outside +/- 2**63 are not supported.")
     elif isinstance(data, float):
-        #         print('packing float')
         if len(str(data)) < 8:
             utf = data.encode('utf-8')
             utflen = len(utf)

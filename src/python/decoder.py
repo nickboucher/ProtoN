@@ -109,7 +109,7 @@ def unpack_int(payload):
     sz = 2**(sz + 3)
     int_fmt = 'int:' + str(sz)
 
-    num, payload = payload.readlist([int_unpack_fmt, 'bits'])
+    num, payload = payload.readlist([int_fmt, 'bits'])
 
     # Return the int and any remaining payload
     return num, payload
