@@ -1,6 +1,12 @@
 # Testing
 
-Use this tool to test the ProtoN implementation.
+Use this tool to test the ProtoN implementation. Note: In order to use this testing tool, you much have both Python3.x and Node.js installed on your system.
+
+1. Either use the pre-generated tests in the *json/* directory or generate new tests using the process described below.
+2. Run the test script, supplying the directory of the test JSON files:
+```bash
+./test.py json/
+```
 
 ## Test Generation
 
