@@ -364,7 +364,7 @@ var proton = (function() {
             bits.writebits(bitArr[i], 16);
           }
         } else {
-          throw new Error("Cannot encode intergers greater than 64 bits.");
+          throw new Error("Cannot encode integers greater than 64 bits.");
         }
         return bits;
       } else if (typeof(obj) === 'number') {
