@@ -16,8 +16,9 @@ MAX_KEY_LEN = 10
 # Maximum non-root Object/Key random length
 MAX_CHILD_SIZE = 5
 
-# Maximum 64-bit signed int
-max64 = 9223372036854775807
+# Maximum 52-bit signed int (js stores numbers as 64-bit floats, which only
+# support up to a 52-bit integer value)
+max64 = 2251799813685247
 
 def random_string(size=0, chars=ascii_letters + digits):
     """ Generates a random key """

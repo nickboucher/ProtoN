@@ -50,7 +50,7 @@ def main():
                     print("\u001b[1m\u001b[32mPASS\u001b[0m\u001b[0m");
                     succ += 1
                 else:
-                    print("\u001b[0m\u001b[1mFAIL\u001b[0m\u001b[0m")
+                    print("\u001b[0m\u001b[31mFAIL\u001b[0m\u001b[0m")
                     fail += 1
 
     print("\n" + ('-'*30))

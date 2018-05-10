@@ -1,99 +1,68 @@
-{
-    "NDKO7V": {
-        "aVbbwD6HnW": {
-            "4": {
-                "Dwb": false,
-                "8v9i558ZoK": "ARPfeUZhetRXPbIim5zFim350pzXcEiTVm1is9m0pASW",
-                "Twvjrrm": null,
-                "3cy8": null
-            },
-            "hXxf": false,
-            "odTKSJW3W": []
+[
+    "zKoFZClYe4fm7XX9AZCHdG0bl3t3A3pmv4eh9wVd4Ng2YcDH",
+    -1192137890774212,
+    null,
+    {},
+    "N",
+    "ygCkJl7oj0ZTsjHLs",
+    -370499280913149,
+    "9c84XQlW5vQ4JQmvAdS80kmYdoqhzSKJeQlvNaGAPcbDH",
+    "Wft8a4J",
+    null,
+    {
+        "aKCWGV": null,
+        "oWwf": {
+            "ZfBE": {},
+            "5yl0Ko": null,
+            "45p4": 461.25116705398113
         },
-        "BqsGPqY": 556.2109483559661
+        "JliN4uq5": -609.371310760004
     },
-    "Fy": [],
-    "FUs20CgSc": "TadxjNhAyoevflnHopkii8ncWTD",
-    "dil8wEhj": [
-        null,
-        false,
+    [
+        -1283540029530880,
         {
-            "88ve": 6372374560374924813,
-            "YtBA3": 4978281869598174074
-        }
-    ],
-    "fu8CCf": [
-        {
-            "iHjKG": {
-                "ux": -310.316112752403
-            }
-        },
-        [
-            null,
-            []
-        ],
-        false
-    ],
-    "4vdSqKa": [
-        [
-            {}
-        ],
-        {
-            "4EjuGdEO2r": "DKO5AIfNQ3CZ",
-            "Sy6h": 6226689821847366092,
-            "VocXJpPXqg": [
-                136.27538194678527,
-                [
-                    -6769169671215259907,
-                    null,
-                    null
-                ],
-                null
+            "GiUJK4": -1519406625863202,
+            "MApcdY": [
+                true,
+                true,
+                {
+                    "v": 1208889448106376,
+                    "6BuTYfEy": false,
+                    "KssPOCP5": 318.0848517331269,
+                    "M": null
+                }
             ],
-            "Ua3Fp9l78v": -967.4688011006332
-        },
-        null,
-        -6954338977847483567
-    ],
-    "6vcw75H": [
-        [
-            -298.5337547804495
-        ],
-        [
-            [],
-            -764.0587552030895
-        ]
-    ],
-    "ZAFK": -1867485591080499514,
-    "vcvy7muUdm": [
-        true
-    ],
-    "4gh": 62.89003335465759,
-    "hTdPjM": {
-        "1i": {
-            "1VK4": 775.6913938094362,
-            "G6": -332.594315715834
+            "L7w4MX": {
+                "o9nx5": false,
+                "QDaS": {
+                    "kmwCOl": "wgnW2WWO0hThmiUrYLAt2lELQf5C0Uw4tNCS7hpDRa",
+                    "q": [],
+                    "J8r14Vh0i": 1554522754407185
+                },
+                "9Wv": true
+            }
         }
+    ],
+    null,
+    true,
+    true,
+    462632905335374,
+    true,
+    null,
+    null,
+    [
+        []
+    ],
+    null,
+    "duzntJT54Jzp5K7o69hNwBCaC1M",
+    [
+        false,
+        -2198399567464565
+    ],
+    {
+        "JVSyYs": []
     },
-    "arpX6cU0": "XF",
-    "sX": null,
-    "yqsRHZ": 5651359632867310827,
-    "lHnctoQxPI": {
-        "4wbMeDQKho": "oOYzGbdfPhxiRNfUFsuw9laiUvzJ21KMvb0Z6WHiajG",
-        "H": [
-            {
-                "qCKdaUJlUn": 79.57533665310393,
-                "DiTaSn": "QoMM7qsuO3WsbLP1GpHuqtlj1",
-                "dQHRhZNU": false
-            },
-            128.07556928467125,
-            "xM6GlilwOozkMCG4OlRbazRuyyf"
-        ],
-        "2Q": 73.23946531273532
-    },
-    "QguaV": -174.1664225572448,
-    "IRiO7WA": false,
-    "SFY": false,
-    "9vF": 870.7450091327555,
-    "JQv8": []
-}
+    413.8719098078798,
+    186.40624128930858,
+    827.9765423917092
+]

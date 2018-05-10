@@ -501,7 +501,7 @@ var proton = (function() {
           // JS can only handle integers up to 32 bits, so we will return
           // Infinity for values greater than we can handle
           if (high > 0xFFFFF) {
-            return Infinity;
+            console.warn("Integer value too large for JavaScript. Auto rounding will occur.")
           }
           var low = buf.getInt32(4, false);
           high |= 0; // a trick to get signed
