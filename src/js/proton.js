@@ -357,11 +357,20 @@ var proton = (function() {
           // Write flag that number is 64-bits
           bits.writebits(3,2);
           // Pack number as 64-bit signed integer
-          var low = obj & (0xFFFFFFFF);
-          var high = (obj - low) / BIT32;
-          var bitArr = [high>>>16, high&(0xFFFF), low>>>16, low&(0xFFFF)];
-          for (var i=0; i<bitArr.length; i++) {
-            bits.writebits(bitArr[i], 16);
+          // Thanks to Yusuke Kawasaki for the algorithm
+          // (https://github.com/kawanet/int64-buffer)
+          var num = obj<0 ? obj+1 : obj;
+          var buf = [0,0,0,0,0,0,0,0];
+          for (var i=7; i>=0; i--) {
+            if (obj < 0) {
+              buf[i] = ((-num) & 255) ^ 255;
+            } else {
+              buf[i] = num & 255;
+            }
+            num /= 256;
+          }
+          for (var i=0; i<8; i++) {
+            bits.writebits(buf[i], 8);
           }
         } else {
           throw new Error("Cannot encode integers greater than 64 bits.");
@@ -497,13 +506,13 @@ var proton = (function() {
           }
           // Thanks to Yusuke Kawasaki for the algorithm
           // (https://github.com/kawanet/int64-buffer)
-          var high = buf.getInt32(0, false);
+          var high = buf.getUint32(0, false);
           // JS can only handle integers up to 32 bits, so we will return
-          // Infinity for values greater than we can handle
-          if (high > 0xFFFFF) {
+          // give a warning for values greater than we can handle
+          if ((high & 0x80000000 && ~high > 0x1FFFFF) || (!(high & 0x80000000) && high > 0x1FFFFF)) {
             console.warn("Integer value too large for JavaScript. Auto rounding will occur.")
           }
-          var low = buf.getInt32(4, false);
+          var low = buf.getUint32(4, false);
           high |= 0; // a trick to get signed
           return high ? (high * BIT32 + low) : low;
         } else {
