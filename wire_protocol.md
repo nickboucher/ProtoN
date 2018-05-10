@@ -22,7 +22,7 @@ Network Byte Order (Big-Endian)
 - bool: 1-bit encoding of boolean values {0b0: `False`; 0b1: `True`}
 - String: <len, UTF-8 encoded string>
 - ShortStr: <uint3, UTF-8 encoded string>
-- len: <uint2, uint8|uint16|uint32>
+- len: <uint2, uint8|uint16|uint32|uint64>
 
 ## OpCodes
 
