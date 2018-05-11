@@ -103,8 +103,19 @@ def pack_type(dtype):
 
 
 def pack_len(length, short=False):
-    sz = 16 if not short else 3
-    return BitStream(uint=length, length=sz)
+    assert(length >= 0)
+    if short:
+        sz = 3
+        return BitStream(uint=length, length=sz)
+    elif length < 2**8-1:
+        return BitStream(uint=0, length=2) + BitStream(uint=length, length=8)
+    elif length < 2**16-1:
+        return BitStream(uint=1, length=2) + BitStream(uint=length, length=16)
+    elif length < 2**32-1:
+        return BitStream(uint=2, length=2) + BitStream(uint=length, length=32)
+    elif length < 2**64-1:
+        return BitStream(uint=3, length=2) + BitStream(uint=length, length=64)
+
 
 
 def pack_bool(boolean):

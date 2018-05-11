@@ -134,9 +134,12 @@ def unpack_len(payload, short=False):
 
     # Calculate the size of the number representing the lenght of the str`
     # Slice the length of the string from the data and unpack it
-    sz = 16 if not short else 3
-    fmt_str = "uint:" + str(sz)
-    length, payload = payload.readlist([fmt_str, 'bits'])
+    if short:
+        length, payload = payload.readlist(['uint:3', 'bits'])
+    else:
+        sz, payload = payload.readlist(['uint:2', 'bits'])
+        fmt_str = "uint:" + str(2**(sz+3))
+        length, payload = payload.readlist([fmt_str, 'bits'])
     return length, payload
 
 
