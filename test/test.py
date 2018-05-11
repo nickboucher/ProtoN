@@ -6,6 +6,7 @@ from subprocess import check_output
 from json import load
 from encoder import *
 from decoder import *
+from pprint import pprint
 
 def usage():
     """ Bad CLI options passed """
@@ -26,7 +27,8 @@ def main():
                 obj = load(f)
             # Do the PY testing
             print("Testing \u001b[1m" + filename + "\u001b[0m PY...", end="")
-            if (obj == decode(encode(obj))):
+            enc = encode(obj)
+            if obj == decode(enc):
                 print("\u001b[1m\u001b[32mPASS\u001b[0m\u001b[0m");
                 succ += 1
             else:
@@ -34,6 +36,7 @@ def main():
                 fail += 1
             # Get JS encoded bytes
             js = check_output(['./proton_test.js', join(dir,filename)]).decode('utf-8').rstrip()
+
             # Do the JS testing
             print("Testing \u001b[1m" + filename + "\u001b[0m JS...", end="")
             if js == 'FAIL':
@@ -45,12 +48,21 @@ def main():
                 print("\u001b[1m\u001b[32mPASS\u001b[0m\u001b[0m");
                 succ += 1
                 print("Testing \u001b[1m" + filename + "\u001b[0m PY-JS...", end="")
+                # print()
                 bin = bytes(list(map(int,js.split(','))))
+                # d_bin = decode(bin)
+                # pprint(obj)
+                # pprint(d_bin)
+                # for pk, jk in zip(obj.keys(), d_bin.keys()):
+                    # print('keys', pk, jk, pk==jk)
+                    # print('vals', obj[pk], d_bin[jk], obj[pk] == d_bin[jk])
                 if obj == decode(bin):
                     print("\u001b[1m\u001b[32mPASS\u001b[0m\u001b[0m");
                     succ += 1
                 else:
                     print("\u001b[0m\u001b[31mFAIL\u001b[0m\u001b[0m")
+
+                    return
                     fail += 1
 
     print("\n" + ('-'*30))

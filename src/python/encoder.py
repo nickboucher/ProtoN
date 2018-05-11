@@ -41,11 +41,11 @@ def encode_variable(data):
         #         print('packing int')
         if abs(data) <= (2**7 - 1):
             return pack_type(TYPE_INT) + BitStream(uint=0, length=2) + BitStream(int=data, length=8)
-        if abs(data) <= (2**15 - 1):
+        elif abs(data) <= (2**15 - 1):
             return pack_type(TYPE_INT) + BitStream(uint=1, length=2) + BitStream(int=data, length=16)
-        if abs(data) <= (2**31 - 1):
+        elif abs(data) <= (2**31 - 1):
             return pack_type(TYPE_INT) + BitStream(uint=2, length=2) + BitStream(int=data, length=32)
-        if abs(data) <= (2**63 - 1):
+        elif abs(data) <= (2**63 - 1):
             return pack_type(TYPE_INT) + BitStream(uint=3, length=2) + BitStream(int=data, length=64)
         else:
             raise ValueError("int values outside +/- 2**63 are not supported.")
