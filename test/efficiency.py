@@ -50,6 +50,7 @@ def main():
     print("\n" + ('-'*30))
     print("\n\u001b[33mProtoN/JSON Size:", proton_sz/json_sz, "\u001b[0m")
     print("\n\u001b[33mGZip ProtoN/GZip JSON Size:", comp_proton_sz/comp_json_sz, "\u001b[0m")
+    print("\n\u001b[33mProtoN/GZip JSON Size:", proton_sz/comp_json_sz, "\u001b[0m")
     print("\n" + ('-'*30))
 
 if __name__ == '__main__':
