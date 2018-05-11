@@ -42,30 +42,29 @@ def random_object(size=MAX_CHILD_SIZE):
         obj[random_string()] = random_value()
     return obj
 
+def rand_bool():
+    # Random boolean value
+    return choice([True, False])
+
+def rand_null():
+    # Random null value
+    return None
+
+def rand_int():
+    # Random int value
+    return randint(-1*max64, max64)
+
+def rand_float():
+    # Random float value
+    # Constants are arbitrary, but larger consants yield fewer precision
+    # numbers after the decimal point
+    return uniform(-1*MAX_ABS_FLOAT,MAX_ABS_FLOAT)
+
+def rand_string():
+    # Random string value
+    return random_string(size=randrange(MAX_STRING_LEN))
+
 def random_value():
-    def rand_bool():
-        # Random boolean value
-        return choice([True, False])
-
-    def rand_null():
-        # Random null value
-        return None
-
-    def rand_int():
-        # Random int value
-        return randint(-1*max64, max64)
-
-    def rand_float():
-        # Random float value
-        # Constants are arbitrary, but larger consants yield fewer precision
-        # numbers after the decimal point
-        return uniform(-1*MAX_ABS_FLOAT,MAX_ABS_FLOAT)
-
-    def rand_string():
-        # Random string value
-        return random_string(size=randrange(MAX_STRING_LEN))
-
-
     # Select a random type
     rand = choice([rand_bool, rand_null, rand_int, rand_float, rand_string, random_list, random_object])
     # Return the random value

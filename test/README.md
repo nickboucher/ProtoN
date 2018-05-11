@@ -16,6 +16,21 @@ To generate `n` new tests, run:
 ./test_generator.py json n
 ```
 
+# Efficiency Testing
+
+## Type Specific efficiency
+
+To test type-specific efficiency, run the following command in the `/test/` directory:
+
+```bash
+./type_efficiency.py
+```
+This generates a test json file containing 1000 randomly generated values of the same type.
+The size ratio of ProtoN/JSON encoding is then compared.
+Additionally, the same results are shown using GZip-ed results set to maximum space-efficient compression settings.
+
+Note: you can also limit the program to specific test (run `./type_efficiency.py --help`)
+
 ## Credits
 
 Credit to the following sources for JSON encoded test strings:
