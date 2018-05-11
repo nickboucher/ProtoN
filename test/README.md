@@ -13,12 +13,29 @@ Use this tool to test the ProtoN implementation. Note: In order to use this test
 To generate `n` new tests, run:
 
 ```bash
-./test_generator.py json n
+./test_generator.py directory n
 ```
+Where directort is the directory you want to store the results, such as `json/`.
 
-# Efficiency Testing
+# Space Efficiency Testing
 
-## Type Specific efficiency
+## General Efficiency
+
+To test general efficiency, run the following command in the `/test/` directory:
+
+```bash
+./efficiency.py directory
+```
+Where directort is the directory containing the test files, such as `json/`.
+
+This program tests the space-efficiency of all JSON files in the passed
+directory, comparing ProtoN to whitespace-removed JSON.
+It also outputs the results of the same test using GZip compression on the results.
+
+*Note: GZip in this context is defined as an implementation of the [DEFLATE algorithm](https://www.ietf.org/rfc/rfc1950.txt)*
+
+
+## Type Specific Efficiency
 
 To test type-specific efficiency, run the following command in the `/test/` directory:
 
