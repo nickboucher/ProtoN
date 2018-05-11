@@ -26,7 +26,7 @@ To test general efficiency, run the following command in the `/test/` directory:
 ```bash
 ./efficiency.py directory
 ```
-Where directort is the directory containing the test files, such as `json/`.
+Where directory is the directory containing the test files, such as `json/`.
 
 This program tests the space-efficiency of all JSON files in the passed
 directory, comparing ProtoN to whitespace-removed JSON.
