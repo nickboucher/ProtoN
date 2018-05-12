@@ -35,6 +35,12 @@ var proton = (function() {
   const max32 = 2147483647
   // Maximum signed 64-bit number (2^63-1)
   const max64 = 9223372036854775807;
+  // Maximum unsigned 8-bit number (2^8-1)
+  const maxu8 = 255
+  // Maximum unsigned 16-bit number (2^16-1)
+  const maxu16 = 65535
+  // Maximum unsigned 32-bit number (2^32-1)
+  const maxu32 = 4294967295
   // Constant for accessing high 32-bits of 64-bit ints (2^32)
   const BIT32 = 4294967296;
 
@@ -297,12 +303,37 @@ var proton = (function() {
    var encode = function(obj) {
     // Internal function which can be called recursively
     function _encode(obj, bits) {
+      // Helper fundtion to write a "len"
+      function writeLen(len, bits) {
+        if (len < maxu8) {
+          // Write uint8 flag
+          bits.writebits(0,2);
+          bits.writebits(len, 8);
+        } else if (len < max16) {
+          // Write uint16 flag
+          bits.writebits(1,2);
+          bits.writebits(len, 16);
+        } else if (len < max32) {
+          // Write uint32 flag
+          bits.writebits(2,2);
+          bits.writebits(len, 32);
+        } else {
+          // Write uint64 flag
+          bits.writebits(3,2);
+          bits.writebits(len, 64);
+        }
+        return bits;
+      }
       // Helper function to write strings of max character length 2^`maxlen`
       function _writeString(str, bits, maxlen) {
         // Combines built-in encoding functions to achieve UTF-8 encoding
         var utf8 = unescape(encodeURIComponent(str));
-        // Prepend string with length
-        bits.writebits(utf8.length, maxlen);
+        // Prepend string with length if given a bitfield length
+        if (maxlen) {
+          bits.writebits(utf8.length, maxlen);
+        } else {
+          writeLen(utf8.length, bits);
+        }
         // Loop through each byte in resulting string and add to bitstring
         for (var i=0; i<utf8.length; i++) {
           bits.writebits(utf8.charCodeAt(i), 8);
@@ -310,7 +341,7 @@ var proton = (function() {
         return bits;
       }
       // Helper function to write String
-      function writeString(str, bits) {return _writeString(str,bits,16);}
+      function writeString(str, bits) {return _writeString(str,bits,null);}
       // Helper function to write ShortStr
       function writeShortStr(str, bits) {return _writeString(str,bits,3);}
       // Find the proton type of the passed variable
@@ -401,7 +432,7 @@ var proton = (function() {
         // Add List Container TypeCode
         bits.writebits(codes.ConList, codelen);
         // Prepend list with length
-        bits.writebits(obj.length, 16);
+        writeLen(obj.length, bits);
         // Recursively encode each subcomponent
         for (var i=0; i<obj.length; i++) {
           bits = _encode(obj[i], bits);
@@ -411,7 +442,7 @@ var proton = (function() {
         // Add Object Container TypeCode
         bits.writebits(codes.ConObject, codelen);
         // Prepend object items with length
-        bits.writebits(Object.keys(obj).length, 16);
+        writeLen(Object.keys(obj).length, bits);
         // Encode each subcomponent
         Object.keys(obj).forEach(function(key) {
             // Add Key-Value pair TypeCode
@@ -456,7 +487,16 @@ var proton = (function() {
     }
     // Hepler function to read one unsigned 16-bit integer
     function readLen(bits) {
-      return bits.readbits(16);
+      var field = bits.readbits(2);
+      if (field == 0) {
+        return bits.readbits(8);
+      } else if (field == 1) {
+        return bits.readbits(16);
+      } else if (field == 2) {
+        return bits.readbits(32);
+      } else {
+        return bits.readbits(64);
+      }
     }
     // Helper function to read strings
     function _readString(bits, len) {
